@@ -14,28 +14,35 @@ Implementation and performance comparison of four data structures: an **AVL tree
 | `hash-double.h` / `hash-double.c` | Hash table using double hashing (open addressing) for collision resolution |
 | `testing.c` | `main()` entry point; benchmarks all structures and prints timing results |
 | `names.txt` | 30 sample first names, used to generate unique string keys for the hash table benchmarks |
-| `program.exe` | Prebuilt Windows binary |
 | `Data structures and algorithms.pdf` | Original assignment write-up with design notes and measured results |
 
-> **Platform note:** the source uses `<windows.h>` and the `QueryPerformanceCounter` / `QueryPerformanceFrequency` API for high-resolution timing, so this project is Windows-only as written (or requires MinGW-w64 for cross-compiling).
+## Platform
+
+This project is written in portable C and builds on **macOS / Linux / any POSIX system** as well as Windows.
+
+Timing is done with `clock_gettime(CLOCK_MONOTONIC, ...)` from `<time.h>` (POSIX), which replaced the original Windows-only `QueryPerformanceCounter` / `QueryPerformanceFrequency` (`<windows.h>`) implementation. `CLOCK_MONOTONIC` gives a steadily increasing, high-resolution clock immune to system-clock adjustments — the same guarantee `QueryPerformanceCounter` provided on Windows.
+
+> Note for Windows builds: MSVC's C runtime does not provide `clock_gettime`. Compiling on Windows requires MinGW-w64 (which supplies a `clock_gettime` shim) rather than MSVC.
 
 ## Building
 
-On Windows with MinGW/gcc:
-
 ```bash
-gcc -O2 -o program.exe testing.c avl.c splay.c hash-chaining.c hash-double.c
+gcc -O2 -o main testing.c avl.c splay.c hash-chaining.c hash-double.c
 ```
 
-`names.txt` must be in the same directory as the executable at run time, since `testing.c` opens it with a relative path.
+`names.txt` must be in the same working directory as the executable at run time, since `testing.c` opens it with a relative path.
 
 ## Running
 
 ```bash
-./program.exe
+./main
 ```
 
-The program reads `names.txt`, then runs each benchmark for N = 1 000 / 10 000 / 100 000 / 1 000 000, printing insert/search/delete timings (in seconds) to stdout. In `testing.c`'s `main()`, the AVL/Splay tree benchmark calls are commented out by default — only the two hash table benchmarks (chaining and double hashing) run out of the box. Uncomment the `runBenchmarkTrees(...)` calls to include tree benchmarks as well.
+The program reads `names.txt`, then runs every benchmark for N = 1 000 / 10 000 / 100 000 / 1 000 000, printing insert/search/delete timings (in seconds) to stdout for all four structures. Unlike earlier revisions, all benchmark calls in `main()` — trees and hash tables alike — are active by default; no manual uncommenting is required.
+
+For the AVL and splay trees, three additional traversal-based search benchmarks (inorder, preorder, postorder) also run automatically at each N, alongside the direct find-by-key benchmark.
+
+> As noted in the original report, the 1,000,000-element hash table runs may fail on constrained hardware. If that happens, temporarily comment out the tree benchmark calls in `main()` and run only the hash table benchmarks.
 
 ## Data structures
 
@@ -74,7 +81,7 @@ String-keyed hash table using open addressing with two hash functions: `h1` (djb
 
 ## Benchmark methodology (`testing.c`)
 
-For each structure, `n` integer keys (trees) or `n` unique name-derived string keys (hash tables, built as `<name><index>`) are inserted, then searched, then deleted, with `QueryPerformanceCounter` wrapping each phase. Results are printed as `[<name>] N = <n> | Time taken to <op> <seconds>`.
+For each structure, `n` integer keys (trees) or `n` unique name-derived string keys (hash tables, built as `<name><index>`) are inserted, then searched, then deleted, with `getTimeSeconds()` (backed by `clock_gettime`) wrapping each phase. Results are printed as `[<name>] N = <n> | Time taken to <op> <seconds>`.
 
 ## Measured results (from the assignment report)
 
