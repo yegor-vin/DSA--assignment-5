@@ -35,7 +35,7 @@ gcc -O2 -o main testing.c avl.c splay.c hash-chaining.c hash-double.c
 ## Running
 
 ```bash
-./main
+./program
 ```
 
 The program reads `names.txt`, then runs every benchmark for N = 1 000 / 10 000 / 100 000 / 1 000 000, printing insert/search/delete timings (in seconds) to stdout for all four structures. Unlike earlier revisions, all benchmark calls in `main()` — trees and hash tables alike — are active by default; no manual uncommenting is required.
