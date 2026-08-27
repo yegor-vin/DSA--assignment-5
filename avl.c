@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
+#include <time.h>
 #include "avl.h"
 
 struct avlTreeNode *createNode(int key, struct avlTreeNode *parent)

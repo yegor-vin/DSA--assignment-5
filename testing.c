@@ -5,7 +5,7 @@
 #include "splay.h"
 #include "hash-chaining.h"
 #include "hash-double.h"
-#include "windows.h"
+#include <time.h>
 
 void runBenchmarkTrees(char *name, long long n, void (*testFunction)(long long, char *))
 {
@@ -18,83 +18,86 @@ void runBenchmarkTables(char *name, long long n, void (*testFunction)(long long,
   testFunction(n, arrayOfnames, index, name);
 }
 
+double getTimeSeconds(void)
+{
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  return ts.tv_sec + ts.tv_nsec / 1e9;
+}
+
 void testAvl(long long n, char *name)
 {
   struct avlTreeNode *rootAvl = NULL;
-  LARGE_INTEGER frequency;
-  LARGE_INTEGER start, end;
-  QueryPerformanceFrequency(&frequency);
+  double start, end;
 
-  QueryPerformanceCounter(&start);
-
+  start = getTimeSeconds();
   for (int i = 1; i <= n; i++)
   {
     rootAvl = avlInsertNode(rootAvl, i);
   }
-  QueryPerformanceCounter(&end);
+  end = getTimeSeconds();
 
-  double interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  double interval = end - start;
 
   printf("[%s] N = %lld |Time taken to insert %f seconds \n", name, n, interval);
 
-  QueryPerformanceCounter(&start);
+  start = getTimeSeconds();
 
   for (int i = 1; i <= n; i++)
   {
     avlFindNode(rootAvl, i);
   }
-  QueryPerformanceCounter(&end);
+  end = getTimeSeconds();
 
-  interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  interval = end - start;
 
   printf("[%s] N = %lld |Time taken to search %f seconds \n", name, n, interval);
-  
-    QueryPerformanceCounter(&start);
 
-    for (int i = 1; i <= n; i++)
-    {
-      avlInorderSearch(rootAvl, i);
-    }
-    QueryPerformanceCounter(&end);
+  start = getTimeSeconds();
 
-    interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  for (int i = 1; i <= n; i++)
+  {
+    avlInorderSearch(rootAvl, i);
+  }
+  end = getTimeSeconds();
 
-    printf("[%s] N = %lld |Time taken to search(inorder) %f seconds \n", name, n, interval); 
-  
-    QueryPerformanceCounter(&start);
+  interval = end - start;
 
-    for (int i = 1; i <= n; i++)
-    {
-      avlPostorderSearch(rootAvl, i);
-    }
-    QueryPerformanceCounter(&end);
+  printf("[%s] N = %lld |Time taken to search(inorder) %f seconds \n", name, n, interval);
 
-    interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  start = getTimeSeconds();
 
-    printf("[%s] N = %lld |Time taken to search(postorder) %f seconds \n", name, n, interval);  */
+  for (int i = 1; i <= n; i++)
+  {
+    avlPostorderSearch(rootAvl, i);
+  }
+  end = getTimeSeconds();
 
-    QueryPerformanceCounter(&start);
+  interval = end - start;
 
-    for (int i = 1; i <= n; i++)
-    {
-      avlPreorderSearch(rootAvl, i);
-    }
-    QueryPerformanceCounter(&end);
+  printf("[%s] N = %lld |Time taken to search(postorder) %f seconds \n", name, n, interval);
 
-    interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  start = getTimeSeconds();
 
-    printf("[%s] N = %lld |Time taken to search(preorder) %f seconds \n", name, n, interval); 
+  for (int i = 1; i <= n; i++)
+  {
+    avlPreorderSearch(rootAvl, i);
+  }
+  end = getTimeSeconds();
 
+  interval = end - start;
 
-  QueryPerformanceCounter(&start);
+  printf("[%s] N = %lld |Time taken to search(preorder) %f seconds \n", name, n, interval);
+
+  start = getTimeSeconds();
 
   for (int i = 1; i <= n; i++)
   {
     rootAvl = avlDeleteNode(rootAvl, i);
   }
-  QueryPerformanceCounter(&end);
+  end = getTimeSeconds();
 
-  interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  interval = end - start;
 
   printf("[%s] N = %lld |Time taken to delete %f seconds \n", name, n, interval);
   avlFreeTree(rootAvl);
@@ -103,79 +106,79 @@ void testAvl(long long n, char *name)
 void testSplay(long long n, char *name)
 {
   struct splayTreeNode *rootSplay = NULL;
-  LARGE_INTEGER frequency;
-  LARGE_INTEGER start, end;
-  QueryPerformanceFrequency(&frequency);
+  double start, end;
 
-  QueryPerformanceCounter(&start);
+  start = getTimeSeconds();
 
   for (int i = 1; i <= n; i++)
   {
     rootSplay = splayInsertNode(rootSplay, i);
   }
-  QueryPerformanceCounter(&end);
+  end = getTimeSeconds();
 
-  double interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  double interval = end - start;
 
   printf("[%s] N = %lld |Time taken to insert %f seconds \n", name, n, interval);
 
-  QueryPerformanceCounter(&start);
+  start = getTimeSeconds();
 
   for (int i = 1; i <= n; i++)
   {
     splayFindNode(rootSplay, i);
   }
-  QueryPerformanceCounter(&end);
 
-  interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  end = getTimeSeconds();
+
+  interval = end - start;
 
   printf("[%s] N = %lld |Time taken to search %f seconds \n", name, n, interval);
 
-  QueryPerformanceCounter(&start);
+  start = getTimeSeconds();
 
   for (int i = 1; i <= n; i++)
   {
     splayInorderSearch(rootSplay, i);
   }
-  QueryPerformanceCounter(&end);
 
-  interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  end = getTimeSeconds();
+
+  interval = end - start;
 
   printf("[%s] N = %lld |Time taken to search(inorder) %f seconds \n", name, n, interval);
 
-  QueryPerformanceCounter(&start);
+  start = getTimeSeconds();
 
   for (int i = 1; i <= n; i++)
   {
     splayPostorderSearch(rootSplay, i);
   }
-  QueryPerformanceCounter(&end);
+  end = getTimeSeconds();
 
-  interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  interval = end - start;
 
   printf("[%s] N = %lld |Time taken to search(postorder) %f seconds \n", name, n, interval);
 
-  QueryPerformanceCounter(&start);
+  start = getTimeSeconds();
 
   for (int i = 1; i <= n; i++)
   {
     splayPreorderSearch(rootSplay, i);
   }
-  QueryPerformanceCounter(&end);
+  end = getTimeSeconds();
 
-  interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  interval = end - start;
 
-  printf("[%s] N = %lld |Time taken to search(preorder) %f seconds \n", name, n, interval); 
+  printf("[%s] N = %lld |Time taken to search(preorder) %f seconds \n", name, n, interval);
 
-  QueryPerformanceCounter(&start);
+  start = getTimeSeconds();
 
   for (int i = 1; i <= n; i++)
   {
     rootSplay = splayDeleteNode(rootSplay, i);
   }
-  QueryPerformanceCounter(&end);
+  end = getTimeSeconds();
 
-  interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  interval = end - start;
 
   printf("[%s] N = %lld |Time taken to delete %f seconds \n", name, n, interval);
   splayFreeTree(rootSplay);
@@ -184,11 +187,9 @@ void testSplay(long long n, char *name)
 void testChaining(long long n, char **arrayOfNames, int index, char *name)
 {
   struct chainingHashTable *hashTable = chainingCreateTable(n);
-  LARGE_INTEGER frequency;
-  LARGE_INTEGER start, end;
-  QueryPerformanceFrequency(&frequency);
+  double start, end;
 
-  QueryPerformanceCounter(&start);
+  start = getTimeSeconds();
 
   char uniqueKey[70];
   for (int i = 0; i < n; i++)
@@ -196,12 +197,12 @@ void testChaining(long long n, char **arrayOfNames, int index, char *name)
     sprintf(uniqueKey, "%s%d", *(arrayOfNames + (i % index)), i);
     chainingInsertNode(hashTable, uniqueKey, i);
   }
-  QueryPerformanceCounter(&end);
-  double interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  end = getTimeSeconds();
+  double interval = end - start;
 
   printf("[%s] N = %lld |Time taken to insert %f seconds \n", name, n, interval);
 
-  QueryPerformanceCounter(&start);
+  start = getTimeSeconds();
   char uniqueKey1[70];
 
   for (int i = 0; i < n; i++)
@@ -209,12 +210,12 @@ void testChaining(long long n, char **arrayOfNames, int index, char *name)
     sprintf(uniqueKey1, "%s%d", *(arrayOfNames + (i % index)), i);
     chainingFindNode(hashTable, uniqueKey1);
   }
-  QueryPerformanceCounter(&end);
-  interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  end = getTimeSeconds();
+  interval = end - start;
 
   printf("[%s] N = %lld |Time taken to search %f seconds \n", name, n, interval);
 
-  QueryPerformanceCounter(&start);
+  start = getTimeSeconds();
   char uniqueKey2[70];
 
   for (int i = 0; i < n; i++)
@@ -222,8 +223,8 @@ void testChaining(long long n, char **arrayOfNames, int index, char *name)
     sprintf(uniqueKey2, "%s%d", *(arrayOfNames + (i % index)), i);
     chainingDeleteNode(hashTable, uniqueKey2);
   }
-  QueryPerformanceCounter(&end);
-  interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  end = getTimeSeconds();
+  interval = end - start;
 
   printf("[%s] N = %lld |Time taken to delete %f seconds \n", name, n, interval);
 
@@ -233,11 +234,10 @@ void testChaining(long long n, char **arrayOfNames, int index, char *name)
 void testDouble(long long n, char **arrayOfNames, int index, char *name)
 {
   struct doubleHashTable *hashTable = doubleCreateTable(n);
-  LARGE_INTEGER frequency;
-  LARGE_INTEGER start, end;
-  QueryPerformanceFrequency(&frequency);
 
-  QueryPerformanceCounter(&start);
+  double start, end;
+
+  start = getTimeSeconds();
 
   char uniqueKey[70];
   for (int i = 0; i < n; i++)
@@ -245,13 +245,14 @@ void testDouble(long long n, char **arrayOfNames, int index, char *name)
     sprintf(uniqueKey, "%s%d", *(arrayOfNames + (i % index)), i);
     doubleInsertNode(hashTable, uniqueKey, i);
   }
-  QueryPerformanceCounter(&end);
+  end = getTimeSeconds();
 
-  double interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  double interval = end - start;
 
   printf("[%s] N = %lld |Time taken to insert %f seconds \n", name, n, interval);
 
-  QueryPerformanceCounter(&start);
+  start = getTimeSeconds();
+
   char uniqueKey1[70];
 
   for (int i = 0; i < n; i++)
@@ -259,12 +260,13 @@ void testDouble(long long n, char **arrayOfNames, int index, char *name)
     sprintf(uniqueKey1, "%s%d", *(arrayOfNames + (i % index)), i);
     doubleFindNode(hashTable, uniqueKey1);
   }
-  QueryPerformanceCounter(&end);
-  interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  end = getTimeSeconds();
+
+  interval = end - start;
 
   printf("[%s] N = %lld |Time taken to search %f seconds \n", name, n, interval);
 
-  QueryPerformanceCounter(&start);
+  start = getTimeSeconds();
   char uniqueKey2[70];
 
   for (int i = 0; i < n; i++)
@@ -272,8 +274,8 @@ void testDouble(long long n, char **arrayOfNames, int index, char *name)
     sprintf(uniqueKey2, "%s%d", *(arrayOfNames + (i % index)), i);
     doubleDeleteNode(hashTable, uniqueKey2);
   }
-  QueryPerformanceCounter(&end);
-  interval = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+  end = getTimeSeconds();
+  interval = end - start;
 
   printf("[%s] N = %lld |Time taken to delete %f seconds \n", name, n, interval);
 
@@ -282,7 +284,7 @@ void testDouble(long long n, char **arrayOfNames, int index, char *name)
 
 int main()
 {
-  long long int testingCases[4] = {1000, 10000, 100000, 1000000}; 
+  long long int testingCases[4] = {1000, 10000, 100000, 1000000};
 
   FILE *file = fopen("names.txt", "r");
   char currentName[70];
@@ -320,10 +322,10 @@ int main()
     printf("\n");
     runBenchmarkTrees("Splay tree", testingCases[i], testSplay);
     printf("\n");
-     runBenchmarkTables("Hash chaining", testingCases[i], testChaining, arrayOfNames, index);
+    runBenchmarkTables("Hash chaining", testingCases[i], testChaining, arrayOfNames, index);
     printf("\n");
     runBenchmarkTables("Double hashing", testingCases[i], testDouble, arrayOfNames, index);
-    printf("\n"); 
+    printf("\n");
   }
 
   for (int i = 0; i < nameCount; i++)
